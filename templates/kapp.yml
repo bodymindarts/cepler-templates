@@ -1,0 +1,31 @@
+#@ def kapp_cmd(config_dir, app_name):
+#@   return "ytt -f - " + config_dir + "| kapp -f - -a " + app_name
+#@ end
+
+#@ def kube_config_yaml():
+
+#@ end
+
+#@ def kapp_task(input):
+task: execute
+config:
+  platform: linux
+  image_resource:
+    type: registry-image
+    source:
+      repository: k14s/image
+      tag: latest
+  inputs:
+  - name: #@ input
+    path: repo
+  outputs:
+  - name: repo
+  params:
+    KAPP_KUBECONFIG_YAML: #@ kube_config_yaml()
+  run:
+    dir: repo
+    path: sh
+    args:
+    - "-c"
+    - #@ kapp_cmd()
+#@ end

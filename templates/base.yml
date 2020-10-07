@@ -1,13 +1,6 @@
 #@ load("@ytt:data", "data")
 #@ load("@ytt:struct", "struct")
 
-#@ def globals():
-cepler:
-  version: 0.4.0
-  resource_image: cepler/cepler-concourse-resource
-#@ end
-#@ global_values = globals()
-
 #@ def dummy_task(input):
 task: execute
 config:
@@ -28,38 +21,6 @@ config:
     args: ["-c", "find . | grep -v .git"]
 #@ end
 
-#@ def kapp_cmd(config_dir, app_name):
-#@   return "ytt -f - " + config_dir + "| kapp -f - -a " + app_name
-#@end
-
-#@ def kube_config_yaml():
-
-#@ end
-
-#@ def kapp_task(input):
-task: execute
-config:
-  platform: linux
-  image_resource:
-    type: registry-image
-    source:
-      repository: k14s/image
-      tag: latest
-  inputs:
-  - name: #@ input
-    path: repo
-  outputs:
-  - name: repo
-  params:
-    KAPP_KUBECONFIG_YAML: #@ kube_config_yaml()
-  run:
-    dir: repo
-    path: sh
-    args:
-    - "-c"
-    - #@ kapp_cmd()
-#@ end
-
 #@ def job(env_name):
 name: #@ env_name
 serial: true
@@ -69,7 +30,7 @@ plan:
 #@ if/end data.values.exec.type == "dummy":
 - #@ dummy_task(env_name)
 #@ if/end data.values.exec.type == "kapp":
-- #@ kapp_task(env_name)
+- #@ dummy_task(env_name)
 - put: #@ env_name + "-out"
   params:
     repository: repo
@@ -105,10 +66,10 @@ resource_types:
 - name: cepler-in
   type: registry-image
   source:
-    repository: #@ global_values["cepler"]["resource_image"]
-    tag: #@ global_values["cepler"]["version"]
+    repository: #@ data.values.cepler.resource_image
+    tag: #@ data.values.cepler.version
 - name: cepler-out
   type: registry-image
   source:
-    repository: #@ global_values["cepler"]["resource_image"]
-    tag: #@ global_values["cepler"]["version"]
+    repository: #@ data.values.cepler.resource_image
+    tag: #@ data.values.cepler.version

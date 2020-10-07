@@ -1,5 +1,9 @@
 #@data/values
 ---
+cepler:
+  version: 0.4.0
+  resource_image: cepler/cepler-concourse-resource
+
 repo:
   uri: "missing"
   branch: "main"
