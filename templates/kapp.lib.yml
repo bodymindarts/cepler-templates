@@ -10,7 +10,7 @@ config:
     type: registry-image
     source:
       repository: k14s/image
-      tag: latest
+      tag: kbld-rand-1592942790507001000-1148625018150
   inputs:
   - name: #@ input
     path: repo
