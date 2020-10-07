@@ -1,3 +1,99 @@
-ytt: Error: 
-- undefined: kapp_task
-    base.yml:33 | - #@ kapp_task(env_name, data.values.exec)
+jobs:
+- name: testflight
+  serial: true
+  plan:
+  - get: testflight
+    trigger: true
+  - task: execute
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source:
+          repository: k14s/image
+          tag: latest
+      inputs:
+      - name: testflight
+        path: repo
+      outputs:
+      - name: repo
+      run:
+        dir: repo
+        path: sh
+        args:
+        - -c
+        - ytt -f examples/kapp/k8s
+  - put: testflight-out
+    params:
+      repository: repo
+- name: staging
+  serial: true
+  plan:
+  - get: staging
+    trigger: true
+  - task: execute
+    config:
+      platform: linux
+      image_resource:
+        type: registry-image
+        source:
+          repository: k14s/image
+          tag: latest
+      inputs:
+      - name: staging
+        path: repo
+      outputs:
+      - name: repo
+      run:
+        dir: repo
+        path: sh
+        args:
+        - -c
+        - ytt -f examples/kapp/k8s
+  - put: staging-out
+    params:
+      repository: repo
+resources:
+- name: testflight
+  type: cepler-in
+  source:
+    uri: git@github.com:bodymindarts/cepler-templates
+    branch: main
+    private_key: ((github.private_key))
+    environment: testflight
+    config: examples/kapp/cepler.yml
+- name: testflight-out
+  type: cepler-in
+  source:
+    uri: git@github.com:bodymindarts/cepler-templates
+    branch: main
+    private_key: ((github.private_key))
+    environment: testflight
+    config: examples/kapp/cepler.yml
+- name: staging
+  type: cepler-in
+  source:
+    uri: git@github.com:bodymindarts/cepler-templates
+    branch: main
+    private_key: ((github.private_key))
+    environment: staging
+    config: examples/kapp/cepler.yml
+- name: staging-out
+  type: cepler-in
+  source:
+    uri: git@github.com:bodymindarts/cepler-templates
+    branch: main
+    private_key: ((github.private_key))
+    environment: staging
+    config: examples/kapp/cepler.yml
+resource_types:
+- name: cepler-in
+  type: registry-image
+  source:
+    repository: cepler/cepler-concourse-resource
+    tag: 0.4.0
+- name: cepler-out
+  type: registry-image
+  source:
+    repository: cepler/cepler-concourse-resource
+    tag: 0.4.0
