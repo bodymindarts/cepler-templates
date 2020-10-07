@@ -10,6 +10,7 @@ repo:
   branch: "main"
   private_key: "missing"
 
-exec:
-  type: kapp
-  config_dir: "./"
+executor:
+  type: dummy
+  config:
+    config_dir: "./"

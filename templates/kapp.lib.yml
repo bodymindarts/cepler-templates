@@ -1,5 +1,29 @@
+#@ load("@ytt:struct", "struct")
+
 #@ def kapp_cmd(config_dir):
 #@   return "ytt -f " + config_dir
+#@ end
+
+#@ def kapp_kubeconfig(env_name, namespace, token, ca_cert, server):
+apiVersion: v1
+kind: Config
+preferences: {}
+clusters:
+- name: #@ env_name
+  cluster:
+    certificate-authoriy-data: #@ ca_cert
+    server: #@ server
+users:
+- name: #@ env_name + "-user"
+  user:
+    token: #@ token
+contexts:
+- name: #@ env_name
+  context:
+    cluster: #@ env_name
+    user: #@ env_name + "-user"
+    namespace: #@ namespace
+current-context: #@ env_name
 #@ end
 
 #@ def kapp_task(input, kapp_config):
@@ -16,6 +40,9 @@ config:
     path: repo
   outputs:
   - name: repo
+  params:
+    #@ env = struct.decode(kapp_config.creds)[input]
+    KAPP_KUBECONFIG_YAML: #@ kapp_kubeconfig(input, env["namespace"], env["token"], env["ca_cert"], env["server"])
   run:
     dir: repo
     path: sh

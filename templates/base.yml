@@ -28,10 +28,10 @@ serial: true
 plan:
 - get: #@ env_name
   trigger: true
-#@ if/end data.values.exec.type == "dummy":
+#@ if/end data.values.executor.type == "dummy":
 - #@ dummy_task(env_name)
-#@ if/end data.values.exec.type == "kapp":
-- #@ kapp_task(env_name, data.values.exec)
+#@ if/end data.values.executor.type == "kapp":
+- #@ kapp_task(env_name, data.values.executor.config)
 - put: #@ env_name + "-out"
   params:
     repository: repo

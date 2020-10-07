@@ -5,7 +5,19 @@ repo:
   uri: "git@github.com:bodymindarts/cepler-templates"
   private_key: ((github.private_key))
 
-exec:
+executor:
   type: kapp
-  config_dir: "examples/kapp/k8s"
+  config:
+    config_dir: "examples/kapp/k8s"
+    creds:
+      testflight:
+        ca_cert: testflight.ca
+        namespace: testflight
+        server: testflight.server
+        token: ((token.token))
+      staging:
+        ca_cert: staging.ca
+        namespace: staging
+        server: staging.server
+        token: ((token.token))
 

@@ -1,3 +1,3 @@
 #@ load("@ytt:data", "data")
 ---
-injected_environment: #@ data.values.environment_name
+injected_environment_new: #@ data.values.environment_name

@@ -10,12 +10,14 @@ templates_dir=${workspace}/templates
 cat <<EOF > files/cepler.yml
 #@data/values
 #@ load("@ytt:overlay", "overlay")
+#@overlay/match-child-defaults missing_ok=True
 ---
-$(cat inputs/cepler.yml | sed '/^environments:/i #@overlay/match missing_ok=True')
+$(cat inputs/cepler.yml)
 EOF
 
 cat <<EOF > files/ci.yml
 #@data/values
+#@overlay/match-child-defaults missing_ok=True
 ---
 $(cat inputs/ci.yml)
 EOF

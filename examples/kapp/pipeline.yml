@@ -17,6 +17,27 @@ jobs:
         path: repo
       outputs:
       - name: repo
+      params:
+        KAPP_KUBECONFIG_YAML:
+          apiVersion: v1
+          kind: Config
+          preferences: {}
+          clusters:
+          - name: testflight
+            cluster:
+              certificate-authoriy-data: dGVzdGZsaWdodC5jYQ==
+              server: testflight.server
+          users:
+          - name: testflight-user
+            user:
+              token: ((token.token))
+          contexts:
+          - name: testflight
+            context:
+              cluster: testflight
+              user: testflight-user
+              namespace: testflight
+          current-context: testflight
       run:
         dir: repo
         path: sh
@@ -44,6 +65,27 @@ jobs:
         path: repo
       outputs:
       - name: repo
+      params:
+        KAPP_KUBECONFIG_YAML:
+          apiVersion: v1
+          kind: Config
+          preferences: {}
+          clusters:
+          - name: staging
+            cluster:
+              certificate-authoriy-data: c3RhZ2luZy5jYQ==
+              server: staging.server
+          users:
+          - name: staging-user
+            user:
+              token: ((token.token))
+          contexts:
+          - name: staging
+            context:
+              cluster: staging
+              user: staging-user
+              namespace: staging
+          current-context: staging
       run:
         dir: repo
         path: sh
