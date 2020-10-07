@@ -43,7 +43,7 @@ jobs:
         path: sh
         args:
         - -c
-        - ytt -f examples/kapp/k8s | kapp -y -f - -a testflight
+        - ytt -f examples/kapp/k8s | kapp -y deploy -f - -a testflight
   - put: testflight-out
     params:
       repository: repo
@@ -91,7 +91,7 @@ jobs:
         path: sh
         args:
         - -c
-        - ytt -f examples/kapp/k8s | kapp -y -f - -a staging
+        - ytt -f examples/kapp/k8s | kapp -y deploy -f - -a staging
   - put: staging-out
     params:
       repository: repo
