@@ -1,7 +1,7 @@
 #@ load("@ytt:struct", "struct")
 
-#@ def kapp_cmd(config_dir):
-#@   return "ytt -f " + config_dir
+#@ def kapp_cmd(config_dir, app_name):
+#@   return "ytt -f " + config_dir + " | kapp -y -f - -a " + app_name
 #@ end
 
 #@ def kapp_kubeconfig(env_name, namespace, token, ca_cert, server):
@@ -41,12 +41,12 @@ config:
   outputs:
   - name: repo
   params:
-    #@ env = struct.decode(kapp_config.creds)[input]
+    #@ env = struct.decode(kapp_config)[input]
     KAPP_KUBECONFIG_YAML: #@ kapp_kubeconfig(input, env["namespace"], env["token"], env["ca_cert"], env["server"])
   run:
     dir: repo
     path: sh
     args:
     - "-c"
-    - #@ kapp_cmd(kapp_config.config_dir)
+    - #@ kapp_cmd(kapp_config.config_dir, env["app_name"])
 #@ end

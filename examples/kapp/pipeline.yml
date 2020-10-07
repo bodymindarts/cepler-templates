@@ -25,7 +25,7 @@ jobs:
           clusters:
           - name: testflight
             cluster:
-              certificate-authoriy-data: dGVzdGZsaWdodC5jYQ==
+              certificate-authoriy-data: testflight.ca
               server: testflight.server
           users:
           - name: testflight-user
@@ -43,7 +43,7 @@ jobs:
         path: sh
         args:
         - -c
-        - ytt -f examples/kapp/k8s
+        - ytt -f examples/kapp/k8s | kapp -y -f - -a testflight
   - put: testflight-out
     params:
       repository: repo
@@ -73,7 +73,7 @@ jobs:
           clusters:
           - name: staging
             cluster:
-              certificate-authoriy-data: c3RhZ2luZy5jYQ==
+              certificate-authoriy-data: staging.ca
               server: staging.server
           users:
           - name: staging-user
@@ -91,7 +91,7 @@ jobs:
         path: sh
         args:
         - -c
-        - ytt -f examples/kapp/k8s
+        - ytt -f examples/kapp/k8s | kapp -y -f - -a staging
   - put: staging-out
     params:
       repository: repo

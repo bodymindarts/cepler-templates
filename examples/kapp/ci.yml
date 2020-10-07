@@ -9,15 +9,16 @@ executor:
   type: kapp
   config:
     config_dir: "examples/kapp/k8s"
-    creds:
-      testflight:
-        ca_cert: testflight.ca
-        namespace: testflight
-        server: testflight.server
-        token: ((token.token))
-      staging:
-        ca_cert: staging.ca
-        namespace: staging
-        server: staging.server
-        token: ((token.token))
+    testflight:
+      app_name: testflight
+      ca_cert: testflight.ca
+      namespace: testflight
+      server: testflight.server
+      token: ((token.token))
+    staging:
+      app_name: staging
+      ca_cert: staging.ca
+      namespace: staging
+      server: staging.server
+      token: ((token.token))
 
