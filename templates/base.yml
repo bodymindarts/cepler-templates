@@ -1,0 +1,114 @@
+#@ load("@ytt:data", "data")
+#@ load("@ytt:struct", "struct")
+
+#@ def globals():
+cepler:
+  version: 0.4.0
+  resource_image: cepler/cepler-concourse-resource
+#@ end
+#@ global_values = globals()
+
+#@ def dummy_task(input):
+task: execute
+config:
+  platform: linux
+  image_resource:
+    type: registry-image
+    source:
+      repository: bodymindarts/cepler
+      tag: latest
+  inputs:
+  - name: #@ input
+    path: repo
+  outputs:
+  - name: repo
+  run:
+    dir: repo
+    path: sh
+    args: ["-c", "find . | grep -v .git"]
+#@ end
+
+#@ def kapp_cmd(config_dir, app_name):
+#@   return "ytt -f - " + config_dir + "| kapp -f - -a " + app_name
+#@end
+
+#@ def kube_config_yaml():
+
+#@ end
+
+#@ def kapp_task(input):
+task: execute
+config:
+  platform: linux
+  image_resource:
+    type: registry-image
+    source:
+      repository: k14s/image
+      tag: latest
+  inputs:
+  - name: #@ input
+    path: repo
+  outputs:
+  - name: repo
+  params:
+    KAPP_KUBECONFIG_YAML: #@ kube_config_yaml()
+  run:
+    dir: repo
+    path: sh
+    args:
+    - "-c"
+    - #@ kapp_cmd()
+#@ end
+
+#@ def job(env_name):
+name: #@ env_name
+serial: true
+plan:
+- get: #@ env_name
+  trigger: true
+#@ if/end data.values.exec.type == "dummy":
+- #@ dummy_task(env_name)
+#@ if/end data.values.exec.type == "kapp":
+- #@ kapp_task(env_name)
+- put: #@ env_name + "-out"
+  params:
+    repository: repo
+#@ end
+
+jobs:
+#@ kvs = struct.decode(data.values.environments)
+#@ for name in kvs:
+- #@ job(name)
+#@ end
+
+#@ def cepler_source(env_name, path_to_config, repo):
+uri: #@ repo.uri
+branch: #@ repo.branch
+private_key: #@ repo.private_key
+environment: #@ env_name
+config: #@ path_to_config
+#@ end
+
+resources:
+#@ kvs = struct.decode(data.values.environments)
+#@ for name in kvs:
+#@ env = kvs[name]
+- name: #@ name
+  type: "cepler-in"
+  source: #@ cepler_source(name, data.values.cepler_config, data.values.repo)
+- name: #@ name + "-out"
+  type: "cepler-in"
+  source: #@ cepler_source(name, data.values.cepler_config, data.values.repo)
+#@ end
+
+resource_types:
+- name: cepler-in
+  type: registry-image
+  source:
+    repository: #@ global_values["cepler"]["resource_image"]
+    tag: #@ global_values["cepler"]["version"]
+- name: cepler-out
+  type: registry-image
+  source:
+    repository: #@ global_values["cepler"]["resource_image"]
+    tag: #@ global_values["cepler"]["version"]

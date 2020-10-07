@@ -1,0 +1,23 @@
+#!/bin/bash
+
+set -e
+
+workspace=$(pwd)
+files_dir=${workspace}/files
+mkdir ${files_dir}
+templates_dir=${workspace}/templates
+
+cat <<EOF > files/cepler.yml
+#@data/values
+#@ load("@ytt:overlay", "overlay")
+---
+$(cat inputs/cepler.yml | sed '/^environments:/i #@overlay/match missing_ok=True')
+EOF
+
+cat <<EOF > files/ci.yml
+#@data/values
+---
+$(cat inputs/ci.yml)
+EOF
+
+ytt -f ${templates_dir}/base.yml -f ${templates_dir}/input-schema.yml -f files/cepler.yml -f files/ci.yml

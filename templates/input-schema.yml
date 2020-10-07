@@ -1,0 +1,11 @@
+#@data/values
+---
+repo:
+  uri: "missing"
+  branch: "main"
+  private_key: "missing"
+
+cepler_config: "cepler.yml"
+
+exec:
+  type: kapp
