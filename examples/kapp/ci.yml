@@ -1,0 +1,11 @@
+cepler:
+  config: examples/kapp/cepler.yml
+
+repo:
+  uri: "git@github.com:bodymindarts/cepler-templates"
+  private_key: ((github.private_key))
+
+exec:
+  type: kapp
+  config_dir: "examples/kapp/k8s"
+

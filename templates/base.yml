@@ -1,5 +1,6 @@
 #@ load("@ytt:data", "data")
 #@ load("@ytt:struct", "struct")
+#@ load("kapp.lib.yml", "kapp_task")
 
 #@ def dummy_task(input):
 task: execute
@@ -30,7 +31,7 @@ plan:
 #@ if/end data.values.exec.type == "dummy":
 - #@ dummy_task(env_name)
 #@ if/end data.values.exec.type == "kapp":
-- #@ dummy_task(env_name)
+- #@ kapp_task(env_name, data.values.exec)
 - put: #@ env_name + "-out"
   params:
     repository: repo
@@ -56,10 +57,10 @@ resources:
 #@ env = kvs[name]
 - name: #@ name
   type: "cepler-in"
-  source: #@ cepler_source(name, data.values.cepler_config, data.values.repo)
+  source: #@ cepler_source(name, data.values.cepler.config, data.values.repo)
 - name: #@ name + "-out"
   type: "cepler-in"
-  source: #@ cepler_source(name, data.values.cepler_config, data.values.repo)
+  source: #@ cepler_source(name, data.values.cepler.config, data.values.repo)
 #@ end
 
 resource_types:

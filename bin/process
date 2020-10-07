@@ -20,4 +20,4 @@ cat <<EOF > files/ci.yml
 $(cat inputs/ci.yml)
 EOF
 
-ytt -f ${templates_dir}/base.yml -f ${templates_dir}/input-schema.yml -f files/cepler.yml -f files/ci.yml
+ytt -f ${templates_dir} -f files/cepler.yml -f files/ci.yml

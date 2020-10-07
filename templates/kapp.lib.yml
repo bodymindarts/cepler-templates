@@ -1,12 +1,8 @@
-#@ def kapp_cmd(config_dir, app_name):
-#@   return "ytt -f - " + config_dir + "| kapp -f - -a " + app_name
+#@ def kapp_cmd(config_dir):
+#@   return "ytt -f " + config_dir
 #@ end
 
-#@ def kube_config_yaml():
-
-#@ end
-
-#@ def kapp_task(input):
+#@ def kapp_task(input, kapp_config):
 task: execute
 config:
   platform: linux
@@ -20,12 +16,10 @@ config:
     path: repo
   outputs:
   - name: repo
-  params:
-    KAPP_KUBECONFIG_YAML: #@ kube_config_yaml()
   run:
     dir: repo
     path: sh
     args:
     - "-c"
-    - #@ kapp_cmd()
+    - #@ kapp_cmd(kapp_config.config_dir)
 #@ end

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+docker run -v $(pwd):/workspace/inputs -it piper process > pipeline.yml
+fly -t bucc set-pipeline -p kapp -c pipeline.yml
+

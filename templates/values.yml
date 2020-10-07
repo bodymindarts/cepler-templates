@@ -1,6 +1,7 @@
 #@data/values
 ---
 cepler:
+  config: "cepler.yml"
   version: 0.4.0
   resource_image: cepler/cepler-concourse-resource
 
@@ -9,7 +10,6 @@ repo:
   branch: "main"
   private_key: "missing"
 
-cepler_config: "cepler.yml"
-
 exec:
   type: kapp
+  config_dir: "./"
