@@ -1,11 +1,11 @@
 environments:
   testflight:
     latest:
-    - k8s/service.yml
-    - k8s/environments/testflight.yml
+    - examples/kapp/k8s/service.yml
+    - examples/kapp/k8s/environments/testflight.yml
   staging:
     passed: testflight
     propagated:
-    - k8s/service.yml
+    - examples/kapp/k8s/service.yml
     latest:
-    - k8s/environments/staging.yml
+    - examples/kapp/k8s/environments/staging.yml
