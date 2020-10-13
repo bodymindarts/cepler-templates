@@ -25,7 +25,7 @@ jobs:
           clusters:
           - name: testflight
             cluster:
-              certificate-authoriy-data: testflight.ca
+              certificate-authority-data: testflight.ca
               server: testflight.server
           users:
           - name: testflight-user
@@ -73,7 +73,7 @@ jobs:
           clusters:
           - name: staging
             cluster:
-              certificate-authoriy-data: staging.ca
+              certificate-authority-data: staging.ca
               server: staging.server
           users:
           - name: staging-user

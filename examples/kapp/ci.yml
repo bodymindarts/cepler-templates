@@ -8,7 +8,8 @@ repo:
 executor:
   type: kapp
   config:
-    config_dir: "examples/kapp/k8s"
+    templates:
+    - examples/kapp/k8s
     testflight:
       app_name: testflight
       ca_cert: testflight.ca

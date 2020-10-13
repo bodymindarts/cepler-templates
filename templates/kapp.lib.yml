@@ -1,7 +1,7 @@
 #@ load("@ytt:struct", "struct")
 
-#@ def kapp_cmd(config_dir, app_name):
-#@   return "ytt -f " + config_dir + " | kapp -y deploy -f - -a " + app_name
+#@ def kapp_cmd(templates, app_name):
+#@   return "ytt -f " + " -f ".join(templates) +  " | kapp -y deploy -f - -a " + app_name
 #@ end
 
 #@ def kapp_kubeconfig(env_name, namespace, token, ca_cert, server):
@@ -11,7 +11,7 @@ preferences: {}
 clusters:
 - name: #@ env_name
   cluster:
-    certificate-authoriy-data: #@ ca_cert
+    certificate-authority-data: #@ ca_cert
     server: #@ server
 users:
 - name: #@ env_name + "-user"
@@ -48,5 +48,5 @@ config:
     path: sh
     args:
     - "-c"
-    - #@ kapp_cmd(kapp_config.config_dir, env["app_name"])
+    - #@ kapp_cmd(kapp_config.templates, env["app_name"])
 #@ end
