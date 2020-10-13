@@ -1,7 +1,7 @@
 #@ load("@ytt:struct", "struct")
 
 #@ def kapp_cmd(templates, app_name):
-#@   return "ytt -f ../secrets/values -f " + " -f ".join(templates) +  " | kapp -y deploy -f - -a " + app_name
+#@   return "ytt -f ../secrets/values.yml -f " + " -f ".join(templates) +  " | kapp -y deploy -f - -a " + app_name
 #@ end
 
 #@ def kapp_kubeconfig(env_name, namespace, token, ca_cert, server):

@@ -45,7 +45,11 @@ plan:
       path: sh
       args:
       - "-c"
-      - 'echo #@ load("@ytt:data", "data")\n---\n${SECRETS} > secrets/values'
+      - |
+        cat <<EOF > secrets/values.yml
+        #@data/values
+        ---
+        ${SECRETS}
 #@ if/end data.values.executor.type == "dummy":
 - #@ dummy_task(env_name)
 #@ if/end data.values.executor.type == "kapp":
