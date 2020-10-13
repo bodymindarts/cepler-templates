@@ -1,2 +1,2 @@
 build:
-	docker build -t piper .
+	docker build -t bodymindarts/cepler-templates:latest .

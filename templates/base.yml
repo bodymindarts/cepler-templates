@@ -9,7 +9,7 @@ config:
   image_resource:
     type: registry-image
     source:
-      repository: bodymindarts/cepler
+      repository: bodymindarts/cepler-templates
       tag: latest
   inputs:
   - name: #@ input
@@ -28,6 +28,24 @@ serial: true
 plan:
 - get: #@ env_name
   trigger: true
+- task: render-secrets
+  config:
+    platform: linux
+    image_resource:
+      type: registry-image
+      source:
+        repository: bodymindarts/cepler-templates
+        tag: latest
+    outputs:
+    - name: secrets
+    params:
+      SECRETS:
+        secrets: #@ data.values.secrets
+    run:
+      path: sh
+      args:
+      - "-c"
+      - 'echo #@ load("@ytt:data", "data")\n---\n${SECRETS} > secrets/values'
 #@ if/end data.values.executor.type == "dummy":
 - #@ dummy_task(env_name)
 #@ if/end data.values.executor.type == "kapp":

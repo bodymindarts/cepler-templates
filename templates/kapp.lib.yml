@@ -1,7 +1,7 @@
 #@ load("@ytt:struct", "struct")
 
 #@ def kapp_cmd(templates, app_name):
-#@   return "ytt -f " + " -f ".join(templates) +  " | kapp -y deploy -f - -a " + app_name
+#@   return "ytt -f ../secrets/values -f " + " -f ".join(templates) +  " | kapp -y deploy -f - -a " + app_name
 #@ end
 
 #@ def kapp_kubeconfig(env_name, namespace, token, ca_cert, server):
@@ -22,31 +22,32 @@ contexts:
   context:
     cluster: #@ env_name
     user: #@ env_name + "-user"
-    namespace: #@ namespace
 current-context: #@ env_name
 #@ end
 
 #@ def kapp_task(input, kapp_config):
-task: execute
-config:
-  platform: linux
-  image_resource:
-    type: registry-image
-    source:
-      repository: k14s/image
-      tag: kbld-rand-1592942790507001000-1148625018150
-  inputs:
-  - name: #@ input
-    path: repo
-  outputs:
-  - name: repo
-  params:
-    #@ env = struct.decode(kapp_config)[input]
-    KAPP_KUBECONFIG_YAML: #@ kapp_kubeconfig(input, env["namespace"], env["token"], env["ca_cert"], env["server"])
-  run:
-    dir: repo
-    path: sh
-    args:
-    - "-c"
-    - #@ kapp_cmd(kapp_config.templates, env["app_name"])
+do:
+- task: execute
+  config:
+    platform: linux
+    image_resource:
+      type: registry-image
+      source:
+        repository: bodymindarts/cepler-templates
+        tag: latest
+    inputs:
+    - name: #@ input
+      path: repo
+    - name: secrets
+    outputs:
+    - name: repo
+    params:
+      #@ env = struct.decode(kapp_config)[input]
+      KAPP_KUBECONFIG_YAML: #@ kapp_kubeconfig(input, env["namespace"], env["token"], env["ca_cert"], env["server"])
+    run:
+      dir: repo
+      path: sh
+      args:
+      - "-c"
+      - #@ kapp_cmd(kapp_config.templates, env["app_name"])
 #@ end

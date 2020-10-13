@@ -4,46 +4,66 @@ jobs:
   plan:
   - get: testflight
     trigger: true
-  - task: execute
-    config:
-      platform: linux
-      image_resource:
-        type: registry-image
-        source:
-          repository: k14s/image
-          tag: kbld-rand-1592942790507001000-1148625018150
-      inputs:
-      - name: testflight
-        path: repo
-      outputs:
-      - name: repo
-      params:
-        KAPP_KUBECONFIG_YAML:
-          apiVersion: v1
-          kind: Config
-          preferences: {}
-          clusters:
-          - name: testflight
-            cluster:
-              certificate-authority-data: testflight.ca
-              server: testflight.server
-          users:
-          - name: testflight-user
-            user:
-              token: ((token.token))
-          contexts:
-          - name: testflight
-            context:
-              cluster: testflight
-              user: testflight-user
-              namespace: testflight
-          current-context: testflight
-      run:
-        dir: repo
-        path: sh
-        args:
-        - -c
-        - ytt -f examples/kapp/k8s | kapp -y deploy -f - -a testflight
+  - do:
+    - task: render-secrets
+      config:
+        platform: linux
+        image_resource:
+          type: registry-image
+          source:
+            repository: bodymindarts/cepler-templates
+            tag: latest
+        outputs:
+        - name: secrets
+        params:
+          SECRETS:
+            secrets:
+              github_private_key: ((github.private_key))
+        run:
+          path: sh
+          args:
+          - -c
+          - 'echo #@ load("@ytt:data", "data")\n---\n${SECRETS} > secrets/values'
+    - task: execute
+      config:
+        platform: linux
+        image_resource:
+          type: registry-image
+          source:
+            repository: bodymindarts/cepler-templates
+            tag: latest
+        inputs:
+        - name: testflight
+          path: repo
+        - name: secrets
+        outputs:
+        - name: repo
+        params:
+          KAPP_KUBECONFIG_YAML:
+            apiVersion: v1
+            kind: Config
+            preferences: {}
+            clusters:
+            - name: testflight
+              cluster:
+                certificate-authority-data: testflight.ca
+                server: testflight.server
+            users:
+            - name: testflight-user
+              user:
+                token: ((token.token))
+            contexts:
+            - name: testflight
+              context:
+                cluster: testflight
+                user: testflight-user
+            current-context: testflight
+        run:
+          dir: repo
+          path: sh
+          args:
+          - -c
+          - ytt -f ../secrets/values -f examples/kapp/k8s | kapp -y deploy -f - -a testflight
   - put: testflight-out
     params:
       repository: repo
@@ -52,46 +72,66 @@ jobs:
   plan:
   - get: staging
     trigger: true
-  - task: execute
-    config:
-      platform: linux
-      image_resource:
-        type: registry-image
-        source:
-          repository: k14s/image
-          tag: kbld-rand-1592942790507001000-1148625018150
-      inputs:
-      - name: staging
-        path: repo
-      outputs:
-      - name: repo
-      params:
-        KAPP_KUBECONFIG_YAML:
-          apiVersion: v1
-          kind: Config
-          preferences: {}
-          clusters:
-          - name: staging
-            cluster:
-              certificate-authority-data: staging.ca
-              server: staging.server
-          users:
-          - name: staging-user
-            user:
-              token: ((token.token))
-          contexts:
-          - name: staging
-            context:
-              cluster: staging
-              user: staging-user
-              namespace: staging
-          current-context: staging
-      run:
-        dir: repo
-        path: sh
-        args:
-        - -c
-        - ytt -f examples/kapp/k8s | kapp -y deploy -f - -a staging
+  - do:
+    - task: render-secrets
+      config:
+        platform: linux
+        image_resource:
+          type: registry-image
+          source:
+            repository: bodymindarts/cepler-templates
+            tag: latest
+        outputs:
+        - name: secrets
+        params:
+          SECRETS:
+            secrets:
+              github_private_key: ((github.private_key))
+        run:
+          path: sh
+          args:
+          - -c
+          - 'echo #@ load("@ytt:data", "data")\n---\n${SECRETS} > secrets/values'
+    - task: execute
+      config:
+        platform: linux
+        image_resource:
+          type: registry-image
+          source:
+            repository: bodymindarts/cepler-templates
+            tag: latest
+        inputs:
+        - name: staging
+          path: repo
+        - name: secrets
+        outputs:
+        - name: repo
+        params:
+          KAPP_KUBECONFIG_YAML:
+            apiVersion: v1
+            kind: Config
+            preferences: {}
+            clusters:
+            - name: staging
+              cluster:
+                certificate-authority-data: staging.ca
+                server: staging.server
+            users:
+            - name: staging-user
+              user:
+                token: ((token.token))
+            contexts:
+            - name: staging
+              context:
+                cluster: staging
+                user: staging-user
+            current-context: staging
+        run:
+          dir: repo
+          path: sh
+          args:
+          - -c
+          - ytt -f ../secrets/values -f examples/kapp/k8s | kapp -y deploy -f - -a staging
   - put: staging-out
     params:
       repository: repo
