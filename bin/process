@@ -17,6 +17,7 @@ EOF
 
 cat <<EOF > files/ci.yml
 #@data/values
+#@ load("@ytt:overlay", "overlay")
 #@overlay/match-child-defaults missing_ok=True
 ---
 $(cat inputs/ci.yml)
