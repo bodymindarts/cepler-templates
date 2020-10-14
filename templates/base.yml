@@ -39,8 +39,7 @@ plan:
     outputs:
     - name: secrets
     params:
-      SECRETS:
-        secrets: #@ data.values.secrets
+      SECRETS: #@ data.values.secrets
     run:
       path: sh
       args:
