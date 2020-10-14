@@ -34,7 +34,7 @@ do:
       type: registry-image
       source:
         repository: bodymindarts/cepler-templates
-        tag: latest
+        tag: 0.1.0
     inputs:
     - name: #@ input
       path: repo

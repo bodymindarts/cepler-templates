@@ -11,13 +11,12 @@ jobs:
         type: registry-image
         source:
           repository: bodymindarts/cepler-templates
-          tag: latest
+          tag: 0.1.0
       outputs:
       - name: secrets
       params:
         SECRETS:
-          secrets:
-            github_private_key: ((github.private_key))
+          github_private_key: ((github.private_key))
       run:
         path: sh
         args:
@@ -67,7 +66,7 @@ jobs:
           path: sh
           args:
           - -c
-          - ytt -f ../secrets/values.yml -f examples/kapp/k8s | kapp -y deploy -f - -a testflight
+          - ytt -f examples/kapp/k8s -f ../secrets/values.yml | kapp -y deploy -f - -a testflight
   - put: testflight-out
     params:
       repository: repo
@@ -83,13 +82,12 @@ jobs:
         type: registry-image
         source:
           repository: bodymindarts/cepler-templates
-          tag: latest
+          tag: 0.1.0
       outputs:
       - name: secrets
       params:
         SECRETS:
-          secrets:
-            github_private_key: ((github.private_key))
+          github_private_key: ((github.private_key))
       run:
         path: sh
         args:
@@ -139,7 +137,7 @@ jobs:
           path: sh
           args:
           - -c
-          - ytt -f ../secrets/values.yml -f examples/kapp/k8s | kapp -y deploy -f - -a staging
+          - ytt -f examples/kapp/k8s -f ../secrets/values.yml | kapp -y deploy -f - -a staging
   - put: staging-out
     params:
       repository: repo
