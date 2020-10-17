@@ -25,10 +25,10 @@ steps:
     run: cat rendered.yml
 #@ end
 
-#@ def jobs(environments, repo, processor):
+#@ def jobs(environments, config_path, repo, processor):
 #@   jobs = {}
 #@   for name in environments:
-#@     jobs.update([("deploy-" + name, job(name, repo, processor))])
+#@     jobs.update([("deploy-" + name, job(name, config_path, repo, processor))])
 #@   end
 #@ return jobs
 #@ end
@@ -36,6 +36,6 @@ steps:
 #@ def github(ci, cepler):
 name: cepler-deploy
 "on": [push]
-jobs: #@ jobs(cepler["environments"], ci["celper"]["config"], ci["driver"]["repo"], ci["processor"])
+jobs: #@ jobs(cepler["environments"], ci["cepler"]["config"], ci["driver"]["repo"], ci["processor"])
 
 #@ end
