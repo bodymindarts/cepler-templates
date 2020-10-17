@@ -4,7 +4,6 @@
 
 #@ def ytt_processor(processor):
 if: ${{ steps.prepare-cepler.outputs.needs_deploying == 'true' }}
-name: Process
 run: #@ ytt_cmd(processor["files"])
 #@ end
 

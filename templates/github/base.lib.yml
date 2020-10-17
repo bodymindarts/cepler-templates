@@ -21,7 +21,6 @@ steps:
   - #@ ytt_processor(processor)
 #@ if/end processor["debug"]:
   - if: ${{ steps.prepare-cepler.outputs.needs_deploying == 'true' }}
-    name: Debug processor
     run: cat rendered.yml
 #@ end
 
@@ -30,7 +29,7 @@ steps:
 #@   for name in environments:
 #@     jobs.update([("deploy-" + name, job(name, config_path, repo, processor))])
 #@   end
-#@ return jobs
+#@   return jobs
 #@ end
 
 #@ def github(ci, cepler):
