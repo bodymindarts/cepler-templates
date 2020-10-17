@@ -1,6 +1,6 @@
 #@ load("ytt.lib.yml", "ytt_processor")
 
-#@ def job(environment_name, repo, processor):
+#@ def job(environment_name, config_path, repo, processor):
 runs-on: ubuntu-latest
 steps:
   - uses: actions/checkout@v2
@@ -10,6 +10,7 @@ steps:
   - id: prepare-cepler
     uses: bodymindarts/cepler-action@main
     with:
+      config_path: #@ config_path
       environment: #@ environment_name
       prepare: true
   - if: ${{ steps.prepare-cepler.outputs.needs_deploying == 'true' }}
@@ -35,6 +36,6 @@ steps:
 #@ def github(ci, cepler):
 name: cepler-deploy
 "on": [push]
-jobs: #@ jobs(cepler["environments"], ci["driver"]["repo"], ci["processor"])
+jobs: #@ jobs(cepler["environments"], ci["celper"]["config"], ci["driver"]["repo"], ci["processor"])
 
 #@ end
