@@ -1,14 +1,18 @@
-cepler_conf: examples/kapp/cepler.yml
+cepler:
+  config: examples/concourse-ytt-kapp/cepler.yml
 
 driver:
-  type: github
+  type: concourse
   repo:
+    uri: "git@github.com:bodymindarts/cepler-templates"
+    private_key: ((github.private_key))
     branch: main
 
 processor:
   type: ytt
+  debug: true
   files:
-  - example/kapp/k8s
+  - example/ytt-k8s
 
 executor:
   type: kapp
@@ -27,4 +31,3 @@ executor:
       namespace: staging
       server: staging.server
       token: token
-

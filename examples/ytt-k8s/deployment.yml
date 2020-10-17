@@ -1,0 +1,24 @@
+#@ load("@ytt:data", "data")
+
+#@ app_name = "nginx"
+#@ deployment_name = data.values.environment_name + "-" + app_name + "-deployment"
+#@ deployment_tags = { "app": data.values.environment_name + "-" + app_name }
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: #@ deployment_name
+spec:
+  selector:
+    matchLabels: #@ deployment_tags
+  replicas: 2
+  template:
+    metadata:
+      labels: #@ deployment_tags
+    spec:
+      containers:
+      - name: #@ app_name
+        image: #@ "nginx:" + data.values.image_tag
+        ports:
+        - containerPort: 80

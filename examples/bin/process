@@ -1,9 +1,5 @@
 #!/bin/bash
 
-set -e
-
-workspace=$(pwd)
-files_dir=${workspace}/inputs
-templates_dir=${workspace}/templates
-
+templates_dir=templates
+files_dir=examples/${1}
 ytt --data-value-file ci=${files_dir}/ci.yml --data-value-file cepler=${files_dir}/cepler.yml -f ${templates_dir}

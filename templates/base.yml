@@ -1,97 +1,10 @@
-#@ load("@ytt:data", "data")
-#@ load("@ytt:struct", "struct")
-#@ load("kapp.lib.yml", "kapp_task")
+#@ load("values.star","values")
+#@ load("github/base.lib.yml", "github")
+#@ load("concourse/base.lib.yml", "concourse")
 
-#@ def dummy_task(input):
-task: execute
-config:
-  platform: linux
-  image_resource:
-    type: registry-image
-    source:
-      repository: bodymindarts/cepler-templates
-      tag: 0.1.0
-  inputs:
-  - name: #@ input
-    path: repo
-  outputs:
-  - name: repo
-  run:
-    dir: repo
-    path: sh
-    args: ["-c", "find . | grep -v .git"]
+#@ if values["ci"]["driver"]["type"] == "github":
+--- #@ github(values["ci"], values["cepler"])
 #@ end
-
-#@ def job(env_name):
-name: #@ env_name
-serial: true
-plan:
-- get: #@ env_name
-  trigger: true
-- task: render-secrets
-  config:
-    platform: linux
-    image_resource:
-      type: registry-image
-      source:
-        repository: bodymindarts/cepler-templates
-        tag: 0.1.0
-    outputs:
-    - name: secrets
-    params:
-      SECRETS: #@ data.values.secrets
-    run:
-      path: sh
-      args:
-      - "-c"
-      - |
-        cat <<EOF > secrets/values.yml
-        #@data/values
-        ---
-        ${SECRETS}
-#@ if/end data.values.executor.type == "dummy":
-- #@ dummy_task(env_name)
-#@ if/end data.values.executor.type == "kapp":
-- #@ kapp_task(env_name, data.values.executor.config)
-- put: #@ env_name + "-out"
-  params:
-    repository: repo
+#@ if values["ci"]["driver"]["type"] == "concourse":
+--- #@ concourse(values["ci"], values["cepler"])
 #@ end
-
-jobs:
-#@ kvs = struct.decode(data.values.environments)
-#@ for name in kvs:
-- #@ job(name)
-#@ end
-
-#@ def cepler_source(env_name, path_to_config, repo):
-uri: #@ repo.uri
-branch: #@ repo.branch
-private_key: #@ repo.private_key
-environment: #@ env_name
-config: #@ path_to_config
-#@ end
-
-resources:
-#@ kvs = struct.decode(data.values.environments)
-#@ for name in kvs:
-#@ env = kvs[name]
-- name: #@ name
-  type: "cepler-in"
-  source: #@ cepler_source(name, data.values.cepler.config, data.values.repo)
-- name: #@ name + "-out"
-  type: "cepler-in"
-  source: #@ cepler_source(name, data.values.cepler.config, data.values.repo)
-#@ end
-
-resource_types:
-- name: cepler-in
-  type: registry-image
-  source:
-    repository: #@ data.values.cepler.resource_image
-    tag: #@ data.values.cepler.version
-- name: cepler-out
-  type: registry-image
-  source:
-    repository: #@ data.values.cepler.resource_image
-    tag: #@ data.values.cepler.version

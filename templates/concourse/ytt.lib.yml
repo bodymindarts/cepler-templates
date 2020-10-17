@@ -1,0 +1,42 @@
+#@ def ytt_cmd(files):
+#@   return "ytt -f " + " -f ".join(files) + " > ../process/rendered.yml"
+#@ end
+
+#@ def ytt_processor(input, processor):
+do:
+- task: process
+  config:
+    platform: linux
+    image_resource:
+      type: registry-image
+      source:
+        repository: bodymindarts/cepler-templates
+        tag: 0.1.0
+    inputs:
+    - name: #@ input
+      path: repo
+    outputs:
+    - name:  process
+    run:
+      dir: repo
+      path: sh
+      args:
+      - "-c"
+      - #@ ytt_cmd(processor["files"])
+#@ if processor["debug"]:
+- task: debug-processor
+  config:
+    platform: linux
+    image_resource:
+      type: registry-image
+      source:
+        repository: bodymindarts/cepler-templates
+        tag: 0.1.0
+    inputs:
+    - name: process
+    run:
+      dir: process
+      path: cat
+      args: [ process/rendered.yml ]
+#@ end
+#@ end

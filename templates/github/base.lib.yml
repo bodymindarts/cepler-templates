@@ -1,0 +1,42 @@
+#@ def job(environment_name, repo):
+runs-on: ubuntu-latest
+steps:
+  - uses: actions/checkout@v2
+    with:
+      ref: #@ repo["branch"]
+      fetch-depth: 0
+  - id: prepare-cepler
+    uses: bodymindarts/cepler-action@main
+    with:
+      environment: #@ environment_name
+      prepare: true
+  - if: ${{ steps.prepare-cepler.outputs.needs_deploying == 'true' }}
+    name: Deploy
+    run: echo "The time was ${{ steps.prepare-cepler.outputs.needs_deploying }}"
+  - if: ${{ steps.prepare-cepler.outputs.needs_deploying == 'true' }}
+    uses: bodymindarts/cepler-action@main
+    with:
+      environment: testflight
+      record: true
+  - if: ${{ steps.prepare-cepler.outputs.needs_deploying == 'true' }}
+    name: Push changes
+    uses: ad-m/github-push-action@master
+    with:
+      github_token: ${{ secrets.PAT }}
+      branch: ${{ github.ref }}
+#@ end
+
+#@ def jobs(environments, repo):
+#@   jobs = {}
+#@   for name in environments:
+#@     jobs.update([("deploy-" + name, job(name, repo))])
+#@   end
+#@ return jobs
+#@ end
+
+#@ def github(ci, cepler):
+name: cepler-deploy
+"on": [push]
+jobs: #@ jobs(cepler["environments"], ci["driver"]["repo"])
+
+#@ end

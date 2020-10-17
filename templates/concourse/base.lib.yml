@@ -1,0 +1,92 @@
+#@ load("kapp.lib.yml", "kapp_task")
+#@ load("ytt.lib.yml", "ytt_processor")
+
+#@ def dummy_task(input):
+task: execute
+config:
+  platform: linux
+  image_resource:
+    type: registry-image
+    source:
+      repository: bodymindarts/cepler-templates
+      tag: 0.1.0
+  inputs:
+  - name: #@ input
+    path: repo
+  outputs:
+  - name: repo
+  run:
+    dir: repo
+    path: sh
+    args: ["-c", "find . | grep -v .git"]
+#@ end
+
+#@ def job(env_name, secrets, processor, executor):
+name: #@ env_name
+serial: true
+plan:
+- get: #@ env_name
+  trigger: true
+#@ if secrets:
+- task: render-secrets
+  config:
+    platform: linux
+    image_resource:
+      type: registry-image
+      source:
+        repository: bodymindarts/cepler-templates
+        tag: 0.1.0
+    outputs:
+    - name: secrets
+    params:
+      SECRETS: secrets
+    run:
+      path: sh
+      args:
+      - "-c"
+      - |
+        cat <<EOF > secrets/values.yml
+        #@data/values
+        ---
+        ${SECRETS}
+#@ end
+#@ if/end processor["type"] == "ytt":
+- #@ ytt_processor(env_name, processor)
+#@ end
+
+#@ def cepler_source(env_name, path_to_config, repo):
+uri: #@ repo["uri"]
+branch: #@ repo["branch"]
+private_key: #@ repo["private_key"]
+environment: #@ env_name
+config: #@ path_to_config
+#@ end
+
+#@ def concourse(ci, cepler):
+jobs:
+#@ for name in cepler["environments"]:
+- #@ job(name, ci["driver"]["secrets"], ci["processor"], ci["executor"])
+#@ end
+
+resources:
+#@ for name in cepler["environments"]:
+- name: #@ name
+  type: "cepler-in"
+  source: #@ cepler_source(name, ci["cepler"]["config"], ci["driver"]["repo"])
+- name: #@ name + "-out"
+  type: "cepler-in"
+  source: #@ cepler_source(name, ci["cepler"]["config"], ci["driver"]["repo"])
+#@ end
+
+resource_types:
+- name: cepler-in
+  type: registry-image
+  source:
+    repository: cepler/cepler-concourse-resource
+    tag: 0.4.5
+- name: cepler-out
+  type: registry-image
+  source:
+    repository: cepler/cepler-concourse-resource
+    tag: 0.4.5
+#@ end
