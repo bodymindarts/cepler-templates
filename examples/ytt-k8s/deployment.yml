@@ -8,6 +8,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  secret: #@ data.values.github_key
   name: #@ deployment_name
 spec:
   selector:

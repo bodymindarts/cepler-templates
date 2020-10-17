@@ -7,12 +7,14 @@ driver:
     uri: "git@github.com:bodymindarts/cepler-templates"
     private_key: ((github.private_key))
     branch: main
+  secrets:
+    github_key: ((github.private_key))
 
 processor:
   type: ytt
   debug: true
   files:
-  - example/ytt-k8s
+  - examples/ytt-k8s
 
 executor:
   type: kapp

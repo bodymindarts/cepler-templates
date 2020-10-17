@@ -1,0 +1,149 @@
+jobs:
+- name: staging
+  serial: true
+  plan:
+  - get: staging
+    trigger: true
+  - do:
+    - task: render-secrets
+      config:
+        platform: linux
+        image_resource:
+          type: registry-image
+          source:
+            repository: bodymindarts/cepler-templates
+            tag: 0.1.0
+        outputs:
+        - name: secrets
+        params:
+          SECRETS:
+            github_key: ((github.private_key))
+        run:
+          path: sh
+          args:
+          - -c
+          - |
+            cat <<EOF > secrets/values.yml
+            #@data/values
+            #@ load("@ytt:overlay", "overlay")
+            #@overlay/match-child-defaults
+            ---
+            ${SECRETS}
+    - task: process
+      config:
+        platform: linux
+        image_resource:
+          type: registry-image
+          source:
+            repository: bodymindarts/cepler-templates
+            tag: 0.1.0
+        inputs:
+        - name: staging
+          path: repo
+        outputs:
+        - name: process
+        run:
+          dir: repo
+          path: sh
+          args:
+          - -c
+          - ytt -f examples/ytt-k8s -f secrets/values.yml > ../process/rendered.yml
+  - put: staging-out
+    params:
+      repository: repo
+- name: production
+  serial: true
+  plan:
+  - get: production
+    trigger: true
+  - do:
+    - task: render-secrets
+      config:
+        platform: linux
+        image_resource:
+          type: registry-image
+          source:
+            repository: bodymindarts/cepler-templates
+            tag: 0.1.0
+        outputs:
+        - name: secrets
+        params:
+          SECRETS:
+            github_key: ((github.private_key))
+        run:
+          path: sh
+          args:
+          - -c
+          - |
+            cat <<EOF > secrets/values.yml
+            #@data/values
+            #@ load("@ytt:overlay", "overlay")
+            #@overlay/match-child-defaults
+            ---
+            ${SECRETS}
+    - task: process
+      config:
+        platform: linux
+        image_resource:
+          type: registry-image
+          source:
+            repository: bodymindarts/cepler-templates
+            tag: 0.1.0
+        inputs:
+        - name: production
+          path: repo
+        outputs:
+        - name: process
+        run:
+          dir: repo
+          path: sh
+          args:
+          - -c
+          - ytt -f examples/ytt-k8s -f secrets/values.yml > ../process/rendered.yml
+  - put: production-out
+    params:
+      repository: repo
+resources:
+- name: staging
+  type: cepler-in
+  source:
+    uri: git@github.com:bodymindarts/cepler-templates
+    branch: main
+    private_key: ((github.private_key))
+    environment: staging
+    config: examples/concourse-ytt-kapp/cepler.yml
+- name: staging-out
+  type: cepler-in
+  source:
+    uri: git@github.com:bodymindarts/cepler-templates
+    branch: main
+    private_key: ((github.private_key))
+    environment: staging
+    config: examples/concourse-ytt-kapp/cepler.yml
+- name: production
+  type: cepler-in
+  source:
+    uri: git@github.com:bodymindarts/cepler-templates
+    branch: main
+    private_key: ((github.private_key))
+    environment: production
+    config: examples/concourse-ytt-kapp/cepler.yml
+- name: production-out
+  type: cepler-in
+  source:
+    uri: git@github.com:bodymindarts/cepler-templates
+    branch: main
+    private_key: ((github.private_key))
+    environment: production
+    config: examples/concourse-ytt-kapp/cepler.yml
+resource_types:
+- name: cepler-in
+  type: registry-image
+  source:
+    repository: cepler/cepler-concourse-resource
+    tag: 0.4.5
+- name: cepler-out
+  type: registry-image
+  source:
+    repository: cepler/cepler-concourse-resource
+    tag: 0.4.5

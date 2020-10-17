@@ -27,31 +27,11 @@ serial: true
 plan:
 - get: #@ env_name
   trigger: true
-#@ if secrets:
-- task: render-secrets
-  config:
-    platform: linux
-    image_resource:
-      type: registry-image
-      source:
-        repository: bodymindarts/cepler-templates
-        tag: 0.1.0
-    outputs:
-    - name: secrets
-    params:
-      SECRETS: secrets
-    run:
-      path: sh
-      args:
-      - "-c"
-      - |
-        cat <<EOF > secrets/values.yml
-        #@data/values
-        ---
-        ${SECRETS}
-#@ end
 #@ if/end processor["type"] == "ytt":
-- #@ ytt_processor(env_name, processor)
+- #@ ytt_processor(env_name, processor, secrets)
+- put: #@ env_name + "-out"
+  params:
+    repository: repo
 #@ end
 
 #@ def cepler_source(env_name, path_to_config, repo):

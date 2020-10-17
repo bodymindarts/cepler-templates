@@ -1,9 +1,38 @@
-#@ def ytt_cmd(files):
-#@   return "ytt -f " + " -f ".join(files) + " > ../process/rendered.yml"
+#@ def ytt_cmd(files, secrets):
+#@   if secrets:
+#@     return "ytt -f " + " -f ".join(files) + " -f secrets/values.yml > ../process/rendered.yml"
+#@   else:
+#@     return "ytt -f " + " -f ".join(files) + " > ../process/rendered.yml"
+#@  end
 #@ end
 
-#@ def ytt_processor(input, processor):
+#@ def ytt_processor(input, processor, secrets):
 do:
+#@ if secrets:
+- task: render-secrets
+  config:
+    platform: linux
+    image_resource:
+      type: registry-image
+      source:
+        repository: bodymindarts/cepler-templates
+        tag: 0.1.0
+    outputs:
+    - name: secrets
+    params:
+      SECRETS: #@ secrets
+    run:
+      path: sh
+      args:
+      - "-c"
+      - |
+        cat <<EOF > secrets/values.yml
+        #@data/values
+        #@ load("@ytt:overlay", "overlay")
+        #@overlay/match-child-defaults
+        ---
+        ${SECRETS}
+#@ end
 - task: process
   config:
     platform: linux
@@ -22,7 +51,7 @@ do:
       path: sh
       args:
       - "-c"
-      - #@ ytt_cmd(processor["files"])
+      - #@ ytt_cmd(processor["files"], secrets)
 #@ if processor["debug"]:
 - task: debug-processor
   config:
@@ -35,7 +64,6 @@ do:
     inputs:
     - name: process
     run:
-      dir: process
       path: cat
       args: [ process/rendered.yml ]
 #@ end
