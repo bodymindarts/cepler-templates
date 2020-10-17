@@ -1,0 +1,13 @@
+environments:
+  staging:
+    latest:
+    - examples/ytt-k8s/*.yml
+    - examples/ytt-k8s/environments/shared.yml
+    - examples/ytt-k8s/environments/staging.yml
+  production:
+    latest:
+    - examples/ytt-k8s/environments/production.yml
+    passed: staging
+    propagated:
+    - examples/ytt-k8s/*.yml
+    - examples/ytt-k8s/environments/shared.yml

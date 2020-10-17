@@ -1,0 +1,31 @@
+cepler:
+  config: examples/github-ytt-kapp/cepler.yml
+
+driver:
+  type: github
+  repo:
+    branch: main
+
+processor:
+  type: ytt
+  debug: true
+  files:
+  - examples/ytt-k8s
+
+executor:
+  type: kapp
+  config:
+    templates:
+    - examples/kapp/k8s
+    testflight:
+      app_name: testflight
+      ca_cert: testflight.ca
+      namespace: testflight
+      server: testflight.server
+      token: token
+    staging:
+      app_name: staging
+      ca_cert: staging.ca
+      namespace: staging
+      server: staging.server
+      token: token

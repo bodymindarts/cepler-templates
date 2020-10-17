@@ -1,4 +1,6 @@
-#@ def job(environment_name, repo):
+#@ load("ytt.lib.yml", "ytt_processor")
+
+#@ def job(environment_name, repo, processor):
 runs-on: ubuntu-latest
 steps:
   - uses: actions/checkout@v2
@@ -11,25 +13,21 @@ steps:
       environment: #@ environment_name
       prepare: true
   - if: ${{ steps.prepare-cepler.outputs.needs_deploying == 'true' }}
-    name: Deploy
-    run: echo "The time was ${{ steps.prepare-cepler.outputs.needs_deploying }}"
-  - if: ${{ steps.prepare-cepler.outputs.needs_deploying == 'true' }}
-    uses: bodymindarts/cepler-action@main
+    uses: k14s/setup-k14s-action@v1
     with:
-      environment: testflight
-      record: true
+      only: ytt, kapp
+#@ if/end processor["type"] == "ytt":
+  - #@ ytt_processor(processor)
+#@ if/end processor["debug"]:
   - if: ${{ steps.prepare-cepler.outputs.needs_deploying == 'true' }}
-    name: Push changes
-    uses: ad-m/github-push-action@master
-    with:
-      github_token: ${{ secrets.PAT }}
-      branch: ${{ github.ref }}
+    name: Debug processor
+    run: cat rendered.yml
 #@ end
 
-#@ def jobs(environments, repo):
+#@ def jobs(environments, repo, processor):
 #@   jobs = {}
 #@   for name in environments:
-#@     jobs.update([("deploy-" + name, job(name, repo))])
+#@     jobs.update([("deploy-" + name, job(name, repo, processor))])
 #@   end
 #@ return jobs
 #@ end
@@ -37,6 +35,6 @@ steps:
 #@ def github(ci, cepler):
 name: cepler-deploy
 "on": [push]
-jobs: #@ jobs(cepler["environments"], ci["driver"]["repo"])
+jobs: #@ jobs(cepler["environments"], ci["driver"]["repo"], ci["processor"])
 
 #@ end
