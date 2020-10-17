@@ -1,6 +1,6 @@
 #@ def ytt_cmd(files, secrets):
 #@   if secrets:
-#@     return "ytt -f " + " -f ".join(files) + " -f secrets/values.yml > ../process/rendered.yml"
+#@     return "ytt -f " + " -f ".join(files) + " -f ../secrets/values.yml > ../process/rendered.yml"
 #@   else:
 #@     return "ytt -f " + " -f ".join(files) + " > ../process/rendered.yml"
 #@  end
@@ -29,9 +29,9 @@ do:
         cat <<EOF > secrets/values.yml
         #@data/values
         #@ load("@ytt:overlay", "overlay")
-        #@overlay/match-child-defaults
+        #@overlay/match-child-defaults missing_ok=True
         ---
-        ${SECRETS}
+        secrets: ${SECRETS}
 #@ end
 - task: process
   config:
@@ -44,6 +44,8 @@ do:
     inputs:
     - name: #@ input
       path: repo
+#@ if/end secrets:
+    - name: secrets
     outputs:
     - name:  process
     run:
