@@ -27,6 +27,7 @@ current-context: #@ env_name
 
 #@ def kapp_task(env_name, kapp_config):
 if: ${{ steps.prepare-cepler.outputs.needs_deploying == 'true' }}
+id: #@ "deploy-" + env_name
 env:
   KAPP_KUBECONFIG_YAML: #@ json.encode(kapp_kubeconfig(env_name, kapp_config["environments"][env_name]))
 run: #@ kapp_cmd(kapp_config["environments"][env_name]["app_name"])
