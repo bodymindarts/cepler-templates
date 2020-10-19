@@ -31,7 +31,7 @@ do:
         #@ load("@ytt:overlay", "overlay")
         #@overlay/match-child-defaults missing_ok=True
         ---
-        secrets: ${SECRETS}
+        ${SECRETS}
 #@ end
 - task: process
   config:

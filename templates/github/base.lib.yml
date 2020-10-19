@@ -1,6 +1,7 @@
 #@ load("ytt.lib.yml", "ytt_processor")
+#@ load("@ytt:json", "json")
 
-#@ def job(environment_name, config_path, repo, processor):
+#@ def job(environment_name, config_path, repo, processor, secrets):
 runs-on: ubuntu-latest
 steps:
   - uses: actions/checkout@v2
@@ -17,17 +18,31 @@ steps:
     uses: k14s/setup-k14s-action@v1
     with:
       only: ytt, kapp
+#@ if secrets:
+  - if: ${{ steps.prepare-cepler.outputs.needs_deploying == 'true' }}
+    name: render-secrets
+    env:
+      SECRETS: #@ json.encode(secrets)
+    run: |
+      cat <<EOF > secrets.yml
+      #@data/values
+      #@ load("@ytt:overlay", "overlay")
+      #@overlay/match-child-defaults missing_ok=True
+      ---
+      ${SECRETS}
+      EOF
+#@ end
 #@ if/end processor["type"] == "ytt":
-  - #@ ytt_processor(processor)
+  - #@ ytt_processor(processor, secrets)
 #@ if/end processor["debug"]:
   - if: ${{ steps.prepare-cepler.outputs.needs_deploying == 'true' }}
     run: cat rendered.yml
 #@ end
 
-#@ def jobs(environments, config_path, repo, processor):
+#@ def jobs(environments, config_path, repo, processor, secrets):
 #@   jobs = {}
 #@   for name in environments:
-#@     jobs.update([("deploy-" + name, job(name, config_path, repo, processor))])
+#@     jobs.update([("deploy-" + name, job(name, config_path, repo, processor, secrets))])
 #@   end
 #@   return jobs
 #@ end
@@ -35,6 +50,6 @@ steps:
 #@ def github(ci, cepler):
 name: cepler-deploy
 "on": [push]
-jobs: #@ jobs(cepler["environments"], ci["cepler"]["config"], ci["driver"]["repo"], ci["processor"])
+jobs: #@ jobs(cepler["environments"], ci["cepler"]["config"], ci["driver"]["repo"], ci["processor"], ci["driver"]["secrets"])
 
 #@ end

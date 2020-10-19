@@ -1,9 +1,12 @@
-#@ def ytt_cmd(files):
-#@   return "ytt -f " + " -f ".join(files) + " > rendered.yml"
+#@ def ytt_cmd(files, secrets):
+#@   if secrets:
+#@     return "ytt -f " + " -f ".join(files) + " -f secrets.yml > rendered.yml"
+#@  else:
+#@     return "ytt -f " + " -f ".join(files) + " > rendered.yml"
+#@  end
 #@ end
 
-#@ def ytt_processor(processor):
+#@ def ytt_processor(processor, secrets):
 if: ${{ steps.prepare-cepler.outputs.needs_deploying == 'true' }}
-run: #@ ytt_cmd(processor["files"])
+run: #@ ytt_cmd(processor["files"], secrets)
 #@ end
-
