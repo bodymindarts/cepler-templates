@@ -29,9 +29,11 @@ plan:
   trigger: true
 #@ if/end processor["type"] == "ytt":
 - #@ ytt_processor(env_name, processor, secrets)
+#@ if/end executor["type"] == "kapp":
+- #@ kapp_task(env_name, executor)
 - put: #@ env_name + "-out"
   params:
-    repository: repo
+    repository: #@ env_name
 #@ end
 
 #@ def cepler_source(env_name, path_to_config, repo):
