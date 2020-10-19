@@ -1,0 +1,33 @@
+#@ load("@ytt:json", "json")
+
+#@ def kapp_cmd(app_name):
+#@   return "kapp -y deploy -f rendered.yml -a " + app_name
+#@ end
+
+#@ def kapp_kubeconfig(env_name, env_config):
+apiVersion: v1
+kind: Config
+preferences: {}
+clusters:
+- name: #@ env_name
+  cluster:
+    certificate-authority-data: #@ env_config["ca_cert"]
+    server: #@ env_config["server"]
+users:
+- name: #@ env_name + "-user"
+  user:
+    token: #@ env_config["token"]
+contexts:
+- name: #@ env_name
+  context:
+    cluster: #@ env_name
+    user: #@ env_name + "-user"
+current-context: #@ env_name
+#@ end
+
+#@ def kapp_task(env_name, kapp_config):
+if: ${{ steps.prepare-cepler.outputs.needs_deploying == 'true' }}
+env:
+  KAPP_KUBECONFIG_YAML: #@ json.encode(kapp_kubeconfig(env_name, kapp_config["environments"][env_name]))
+run: #@ kapp_cmd(kapp_config["environments"][env_name]["app_name"])
+#@ end

@@ -1,7 +1,8 @@
 #@ load("ytt.lib.yml", "ytt_processor")
+#@ load("kapp.lib.yml", "kapp_task")
 #@ load("@ytt:json", "json")
 
-#@ def job(environment_name, config_path, repo, processor, secrets):
+#@ def job(environment_name, config_path, repo, executor, processor, secrets):
 runs-on: ubuntu-latest
 steps:
   - uses: actions/checkout@v2
@@ -34,15 +35,18 @@ steps:
 #@ end
 #@ if/end processor["type"] == "ytt":
   - #@ ytt_processor(processor, secrets)
-#@ if/end processor["debug"]:
+#@ if processor["debug"]:
   - if: ${{ steps.prepare-cepler.outputs.needs_deploying == 'true' }}
     run: cat rendered.yml
 #@ end
+#@ if/end executor["type"] == "kapp":
+  - #@ kapp_task(environment_name, executor)
+#@ end
 
-#@ def jobs(environments, config_path, repo, processor, secrets):
+#@ def jobs(environments, config_path, repo, executor, processor, secrets):
 #@   jobs = {}
 #@   for name in environments:
-#@     jobs.update([("deploy-" + name, job(name, config_path, repo, processor, secrets))])
+#@     jobs.update([("deploy-" + name, job(name, config_path, repo, executor, processor, secrets))])
 #@   end
 #@   return jobs
 #@ end
@@ -50,6 +54,6 @@ steps:
 #@ def github(ci, cepler):
 name: cepler-deploy
 "on": [push]
-jobs: #@ jobs(cepler["environments"], ci["cepler"]["config"], ci["driver"]["repo"], ci["processor"], ci["driver"]["secrets"])
+jobs: #@ jobs(cepler["environments"], ci["cepler"]["config"], ci["driver"]["repo"], ci["executor"], ci["processor"], ci["driver"]["secrets"])
 
 #@ end

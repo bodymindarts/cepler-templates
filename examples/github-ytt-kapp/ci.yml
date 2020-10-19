@@ -14,9 +14,7 @@ processor:
 
 executor:
   type: kapp
-  config:
-    templates:
-    - examples/kapp/k8s
+  environments:
     testflight:
       app_name: testflight
       ca_cert: testflight.ca
