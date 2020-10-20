@@ -1,5 +1,0 @@
-#!/bin/bash
-
-docker run -v $(pwd):/workspace/inputs -it bodymindarts/cepler-templates:latest process > pipeline.yml
-fly -t bucc set-pipeline -p kapp -c pipeline.yml
-

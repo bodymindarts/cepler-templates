@@ -1,7 +1,0 @@
-what is the interface?
-
-docker run -- inputs.yml
-
-docker run -v $(pwd):/inputs
-
-how to get the path to cepler.yml?

@@ -1,4 +1,0 @@
-#@ load("@ytt:data", "data")
----
-injected_environment_new: #@ data.values.environment_name
-injected_private_key: #@ data.values.secrets.github_private_key

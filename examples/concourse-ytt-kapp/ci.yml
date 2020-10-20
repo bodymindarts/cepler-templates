@@ -16,16 +16,14 @@ processor:
 
 executor:
   type: kapp
-  config:
-    templates:
-    - examples/kapp/k8s
-    testflight:
+  environments:
+    staging:
       app_name: testflight
       ca_cert: testflight.ca
       namespace: testflight
       server: testflight.server
       token: token
-    staging:
+    production:
       app_name: staging
       ca_cert: staging.ca
       namespace: staging

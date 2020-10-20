@@ -5,6 +5,7 @@ driver:
   type: github
   repo:
     branch: main
+    access_token: dummy
 
 processor:
   type: ytt
@@ -15,13 +16,13 @@ processor:
 executor:
   type: kapp
   environments:
-    testflight:
+    staging:
       app_name: testflight
       ca_cert: testflight.ca
       namespace: testflight
       server: testflight.server
       token: token
-    staging:
+    production:
       app_name: staging
       ca_cert: staging.ca
       namespace: staging

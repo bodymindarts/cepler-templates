@@ -6,10 +6,7 @@ load("@ytt:yaml", "yaml")
 ci = yaml.decode(data.values.ci)
 
 ci["processor"].setdefault("debug", False)
-
-if ci["driver"]["type"] == "concourse":
-  ci["driver"].setdefault("secrets")
-end
+ci["driver"].setdefault("secrets")
 
 cepler = yaml.decode(data.values.cepler)
 
