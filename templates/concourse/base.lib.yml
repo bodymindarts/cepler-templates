@@ -1,3 +1,4 @@
+#@ load("/globals.star", "globals")
 #@ load("kapp.lib.yml", "kapp_task")
 #@ load("ytt.lib.yml", "ytt_processor")
 
@@ -8,8 +9,8 @@ config:
   image_resource:
     type: registry-image
     source:
-      repository: bodymindarts/cepler-templates
-      tag: 0.1.0
+      repository: #@ globals["concourse_task_image"]
+      tag: #@ globals["templates_version"]
   inputs:
   - name: #@ input
     path: repo
@@ -65,10 +66,10 @@ resource_types:
   type: registry-image
   source:
     repository: cepler/cepler-concourse-resource
-    tag: 0.4.5
+    tag: #@ globals["cepler_version"]
 - name: cepler-out
   type: registry-image
   source:
     repository: cepler/cepler-concourse-resource
-    tag: 0.4.5
+    tag: #@ globals["cepler_version"]
 #@ end
