@@ -1,5 +1,3 @@
-#@ load("@ytt:struct", "struct")
-
 #@ def kapp_cmd(app_name):
 #@   return "kapp -y deploy -f process/rendered.yml -a " + app_name
 #@ end
