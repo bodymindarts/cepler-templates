@@ -107,14 +107,14 @@ driver:
     access_token: dummy
 
 processor:
-  type: ytt                                  # Processor type `ytt` supported
+  type: ytt                                   # Processor type `ytt` supported
   files:
   - examples/ytt-k8s
 
 executor:
-  type: kapp                                # Executor type `kapp` supported
-  environments:                             # Environments key must contain the same environments as in `cepler.yml`
-    staging:                                # Creds for accessing the staging environment k8s
+  type: kapp                                  # Executor type `kapp` supported
+  environments:                               # Environments key must contain the same environments as in `cepler.yml`
+    staging:                                  # Creds for accessing the staging environment k8s
       app_name: testflight
       ca_cert: testflight.ca
       namespace: testflight
