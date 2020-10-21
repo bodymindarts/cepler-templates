@@ -9,7 +9,6 @@ driver:
 
 processor:
   type: ytt
-  debug: true
   files:
   - examples/ytt-k8s
 
