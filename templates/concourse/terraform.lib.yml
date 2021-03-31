@@ -1,0 +1,13 @@
+#@ def terraform_task(env_name, path):
+do:
+- put: #@ env_name + "-terraform-plan"
+  resource: #@ env_name + "-terraform"
+  params:
+    terraform_source: #@ env_name + "/" + path
+    plan_only: true
+- put: #@ env_name + "-terraform-apply"
+  resource: #@ env_name + "-terraform"
+  params:
+    terraform_source: #@ env_name + "/" + path
+    plan_run: true
+#@ end

@@ -1,0 +1,8 @@
+environments:
+  staging:
+    latest:
+    - examples/concourse-terraform/terraform/*.tf
+  production:
+    latest:
+    - examples/concourse-terraform/terraform/*.tf
+    passed: staging

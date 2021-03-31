@@ -1,0 +1,30 @@
+cepler:
+  config: examples/concourse-terraform/cepler.yml
+
+driver:
+  type: concourse
+  repo:
+    uri: "git@github.com:bodymindarts/cepler-templates"
+    private_key: ((github.private_key))
+    branch: main
+
+executor:
+  type: terraform
+  path: my_tf_folder
+  environments:
+    staging:
+      backend_type: s3
+      backend_config:
+        bucket: mybucket
+        key: mydir/terraform.tfstate
+        region: us-east-1
+        access_key: ((staging_storage_access_key))
+        secret_key: ((staging_storage_secret_key))
+    production:
+      backend_type: s3
+      backend_config:
+        bucket: mybucket
+        key: mydir/terraform.tfstate
+        region: us-east-1
+        access_key: ((staging_storage_access_key))
+        secret_key: ((staging_storage_secret_key))
