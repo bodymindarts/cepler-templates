@@ -34,7 +34,7 @@ plan:
 #@ if/end executor["type"] == "kapp":
 - #@ kapp_task(env_name, executor)
 #@ if/end executor["type"] == "terraform":
-- #@ terraform_task(env_name, executor["path"])
+- #@ terraform_task(env_name, executor)
 - put: #@ env_name + "-out"
   params:
     repository: #@ env_name
@@ -66,7 +66,7 @@ resources:
 #@ if/end ci["executor"]["type"] == "terraform":
 - name:  #@ name + "-terraform"
   type: terraform
-  source: #@ ci["executor"]["environments"][name]
+  source: #@ ci["executor"]["environments"][name]["source"]
 
 #@ end
 

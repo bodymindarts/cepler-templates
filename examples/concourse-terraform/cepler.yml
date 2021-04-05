@@ -2,7 +2,9 @@ environments:
   staging:
     latest:
     - examples/concourse-terraform/terraform/*.tf
+    - examples/concourse-terraform/terraform/staging.tfvars
   production:
     latest:
     - examples/concourse-terraform/terraform/*.tf
+    - examples/concourse-terraform/terraform/production.tfvars
     passed: staging

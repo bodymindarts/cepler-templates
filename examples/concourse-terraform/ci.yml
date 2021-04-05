@@ -10,21 +10,27 @@ driver:
 
 executor:
   type: terraform
-  path: my_tf_folder
+  path: examples/concourse-terraform/terraform
   environments:
     staging:
-      backend_type: s3
-      backend_config:
-        bucket: mybucket
-        key: mydir/terraform.tfstate
-        region: us-east-1
-        access_key: ((staging_storage_access_key))
-        secret_key: ((staging_storage_secret_key))
+      vars_files:
+      - examples/concourse-terraform/terraform/staging.tfvars
+      source:
+        backend_type: s3
+        backend_config:
+          bucket: mybucket
+          key: mydir/terraform.tfstate
+          region: us-east-1
+          access_key: ((staging_storage_access_key))
+          secret_key: ((staging_storage_secret_key))
     production:
-      backend_type: s3
-      backend_config:
-        bucket: mybucket
-        key: mydir/terraform.tfstate
-        region: us-east-1
-        access_key: ((staging_storage_access_key))
-        secret_key: ((staging_storage_secret_key))
+      vars_files:
+      - examples/concourse-terraform/terraform/production.tfvars
+      source:
+        backend_type: s3
+        backend_config:
+          bucket: mybucket
+          key: mydir/terraform.tfstate
+          region: us-east-1
+          access_key: ((staging_storage_access_key))
+          secret_key: ((staging_storage_secret_key))
