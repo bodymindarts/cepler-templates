@@ -127,3 +127,7 @@ executor:
       server: staging.server
       token: token
 ```
+
+## Examples
+
+Please have a look at the (examples)[./examples] for more information.
