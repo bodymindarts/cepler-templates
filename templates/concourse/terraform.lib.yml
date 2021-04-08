@@ -1,0 +1,25 @@
+#@ def terraform_task(env_name, executor):
+do:
+- put: #@ env_name + "-terraform-plan"
+  resource: #@ env_name + "-terraform"
+  params:
+    terraform_source: #@ env_name + "/" + executor["path"]
+    plan_only: true
+    #@ if executor["environments"][env_name]["vars_files"]:
+    vars_files: 
+      #@ for file in executor["environments"][env_name]["vars_files"]:
+      - #@ env_name + "/" + file
+      #@ end
+    #@ end 
+- put: #@ env_name + "-terraform-apply"
+  resource: #@ env_name + "-terraform"
+  params:
+    terraform_source: #@ env_name + "/" + executor["path"]
+    plan_run: true
+    #@ if executor["environments"][env_name]["vars_files"]:
+    vars_files: 
+      #@ for file in executor["environments"][env_name]["vars_files"]:
+      - #@ env_name + "/" + file
+      #@ end
+    #@ end 
+#@ end
