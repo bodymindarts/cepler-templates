@@ -1,5 +1,0 @@
-#@ load("@ytt:overlay", "overlay")
-#@data/values
----
-#@overlay/match missing_ok=True
-environment_name: production
